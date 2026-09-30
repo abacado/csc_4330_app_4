@@ -1,11 +1,11 @@
 {
-    "name": "csc_4330_app_4",
-    "short_name": "csc_4330_app_4",
+    "name": "Pocket Arcade",
+    "short_name": "Pocket Arcade",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#10121F",
+    "theme_color": "#10121F",
+    "description": "Six classic games. One little arcade.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

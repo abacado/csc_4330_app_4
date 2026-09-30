@@ -1,11 +1,8 @@
-name: Android CI - Build APK
+name: Pocket Arcade CI
 
 on:
   push:
-    branches: [main, master, upgrade]
-    tags: ['v*.*.*']
   pull_request:
-    branches: [main, master, upgrade]
   workflow_dispatch:
 
 permissions:
@@ -16,37 +13,97 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  app:
     runs-on: ubuntu-latest
-
+    env:
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Java
-        uses: actions/setup-java@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.47.2'
           channel: stable
           cache: true
-
       - name: Get dependencies
         run: flutter pub get
-
-      - name: Run tests
-        run: flutter test --coverage
-
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Analyze
+        run: flutter analyze
+      - name: Test with coverage
+        run: |
+          mkdir -p test-results
+          flutter test --coverage --machine > test-results/events.json
+      - name: Publish readable test summary
+        if: always()
+        run: |
+          mkdir -p test-results
+          touch test-results/events.json
+          python3 tool/test_report.py test-results/events.json
+          cat test-results/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload test reports and coverage
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: android-apk
-          path: build/app/outputs/flutter-apk/*.apk
+          name: test-reports-and-coverage
+          path: |
+            test-results/
+            coverage/lcov.info
+      - name: Build web
+        run: flutter build web --dart-define="SUPABASE_URL=$SUPABASE_URL" --dart-define="SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY"
+      - name: Build Android APK
+        run: flutter build apk --release --dart-define="SUPABASE_URL=$SUPABASE_URL" --dart-define="SUPABASE_PUBLISHABLE_KEY=$SUPABASE_PUBLISHABLE_KEY"
+      - name: Upload web and Android builds
+        uses: actions/upload-artifact@v7
+        with:
+          name: pocket-arcade-builds
+          path: |
+            build/web/
+            build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
+
+  database:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: test_only
+          POSTGRES_DB: arcade_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: test_only
+      PGDATABASE: arcade_test
+    steps:
+      - uses: actions/checkout@v6
+      - name: Apply schema and test access policies and room rules
+        run: |
+          set -o pipefail
+          mkdir -p test-results
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/bootstrap.sql -f supabase/setup.sql -f supabase/setup.sql -f supabase/tests/rooms_test.sql 2>&1 | tee test-results/database.txt
+      - name: Database job summary
+        if: always()
+        run: |
+          echo '## Database checks' >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          cat test-results/database.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload database report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: database-report
+          path: test-results/database.txt
