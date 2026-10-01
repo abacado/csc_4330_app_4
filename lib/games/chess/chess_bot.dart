@@ -17,7 +17,10 @@ class ChessBot {
   final int depth;
 
   Future<ChessMove?> chooseMove(ChessEngine engine) async {
-    final encoded = await compute(_bestMoveFor, _BotRequest(engine.toFen(), depth));
+    final encoded = await compute(
+      _bestMoveFor,
+      _BotRequest(engine.toFen(), depth),
+    );
     return encoded == null ? null : ChessEngine.decodeMove(encoded);
   }
 }

@@ -11,7 +11,9 @@ void main() {
     final controller = ArcadeController(
       store: LocalStore(await SharedPreferences.getInstance()),
     );
-    await tester.pumpWidget(MaterialApp(home: ChessScreen(controller: controller)));
+    await tester.pumpWidget(
+      MaterialApp(home: ChessScreen(controller: controller)),
+    );
     return controller;
   }
 
@@ -54,7 +56,10 @@ void main() {
   testWidgets('An illegal destination tap is ignored', (tester) async {
     await launch(tester);
     await tapSquare(tester, 12); // select e2
-    await tapSquare(tester, 12 + 24); // tap a non-target square (e6, unreachable)
+    await tapSquare(
+      tester,
+      12 + 24,
+    ); // tap a non-target square (e6, unreachable)
     expect(find.text('White to move'), findsOneWidget);
   });
 

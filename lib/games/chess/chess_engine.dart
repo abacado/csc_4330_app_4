@@ -1,10 +1,22 @@
 const _knightDeltas = [
-  (1, 2), (2, 1), (2, -1), (1, -2),
-  (-1, -2), (-2, -1), (-2, 1), (-1, 2),
+  (1, 2),
+  (2, 1),
+  (2, -1),
+  (1, -2),
+  (-1, -2),
+  (-2, -1),
+  (-2, 1),
+  (-1, 2),
 ];
 const _kingDeltas = [
-  (1, 0), (1, 1), (0, 1), (-1, 1),
-  (-1, 0), (-1, -1), (0, -1), (1, -1),
+  (1, 0),
+  (1, 1),
+  (0, 1),
+  (-1, 1),
+  (-1, 0),
+  (-1, -1),
+  (0, -1),
+  (1, -1),
 ];
 const _bishopDirs = [(1, 1), (1, -1), (-1, 1), (-1, -1)];
 const _rookDirs = [(1, 0), (-1, 0), (0, 1), (0, -1)];
@@ -98,8 +110,10 @@ class ChessEngine {
 
   List<String> get board => List.unmodifiable(_board);
 
-  bool get isCheck =>
-      _attacked(_board.indexOf(turn == 'w' ? 'K' : 'k'), turn == 'w' ? 'b' : 'w');
+  bool get isCheck => _attacked(
+    _board.indexOf(turn == 'w' ? 'K' : 'k'),
+    turn == 'w' ? 'b' : 'w',
+  );
   bool get isCheckmate => isCheck && allLegalMoves().isEmpty;
   bool get isStalemate => !isCheck && allLegalMoves().isEmpty;
   bool get isDraw =>
@@ -140,7 +154,9 @@ class ChessEngine {
     final captured = _board[move.to];
     _board[move.from] = '';
     _board[move.to] = move.promotion != null
-        ? (color == 'w' ? move.promotion!.toUpperCase() : move.promotion!.toLowerCase())
+        ? (color == 'w'
+              ? move.promotion!.toUpperCase()
+              : move.promotion!.toLowerCase())
         : piece;
     if (move.isEnPassant) {
       final capturedSquare = move.to + (color == 'w' ? -8 : 8);
@@ -151,7 +167,8 @@ class ChessEngine {
       _board[move.rookFrom!] = '';
     }
     _updateCastlingRights(piece, move.from, move.to);
-    enPassant = (piece.toUpperCase() == 'P' && (move.to - move.from).abs() == 16)
+    enPassant =
+        (piece.toUpperCase() == 'P' && (move.to - move.from).abs() == 16)
         ? (move.from + move.to) ~/ 2
         : null;
     halfmoveClock = (piece.toUpperCase() == 'P' || captured.isNotEmpty)
@@ -236,7 +253,10 @@ class ChessEngine {
       case 'Q':
         return _slideMoves(square, color, _queenDirs);
       case 'K':
-        return [..._stepMoves(square, color, _kingDeltas), ..._castleMoves(square, color)];
+        return [
+          ..._stepMoves(square, color, _kingDeltas),
+          ..._castleMoves(square, color),
+        ];
       default:
         return const [];
     }
@@ -256,7 +276,9 @@ class ChessEngine {
         final twoRank = rank + 2 * dir;
         if (rank == startRank && _inBounds(file, twoRank)) {
           final twoSquare = twoRank * 8 + file;
-          if (_board[twoSquare].isEmpty) moves.add(ChessMove(square, twoSquare));
+          if (_board[twoSquare].isEmpty) {
+            moves.add(ChessMove(square, twoSquare));
+          }
         }
       }
       for (final df in [-1, 1]) {
@@ -284,7 +306,11 @@ class ChessEngine {
     }
   }
 
-  List<ChessMove> _stepMoves(int square, String color, List<(int, int)> deltas) {
+  List<ChessMove> _stepMoves(
+    int square,
+    String color,
+    List<(int, int)> deltas,
+  ) {
     final moves = <ChessMove>[];
     final file = square % 8, rank = square ~/ 8;
     for (final d in deltas) {
@@ -308,7 +334,9 @@ class ChessEngine {
         if (target.isEmpty) {
           moves.add(ChessMove(square, r * 8 + f));
         } else {
-          if (_colorOf(target) != color) moves.add(ChessMove(square, r * 8 + f));
+          if (_colorOf(target) != color) {
+            moves.add(ChessMove(square, r * 8 + f));
+          }
           break;
         }
         f += d.$1;
@@ -329,7 +357,9 @@ class ChessEngine {
           _board[7] == 'R' &&
           !_attacked(5, opponent) &&
           !_attacked(6, opponent)) {
-        moves.add(const ChessMove(4, 6, isCastle: true, rookFrom: 7, rookTo: 5));
+        moves.add(
+          const ChessMove(4, 6, isCastle: true, rookFrom: 7, rookTo: 5),
+        );
       }
       if (castling.contains('Q') &&
           _board[3].isEmpty &&
@@ -338,7 +368,9 @@ class ChessEngine {
           _board[0] == 'R' &&
           !_attacked(3, opponent) &&
           !_attacked(2, opponent)) {
-        moves.add(const ChessMove(4, 2, isCastle: true, rookFrom: 0, rookTo: 3));
+        moves.add(
+          const ChessMove(4, 2, isCastle: true, rookFrom: 0, rookTo: 3),
+        );
       }
     } else if (color == 'b' && square == 60) {
       if (castling.contains('k') &&
@@ -347,7 +379,9 @@ class ChessEngine {
           _board[63] == 'r' &&
           !_attacked(61, opponent) &&
           !_attacked(62, opponent)) {
-        moves.add(const ChessMove(60, 62, isCastle: true, rookFrom: 63, rookTo: 61));
+        moves.add(
+          const ChessMove(60, 62, isCastle: true, rookFrom: 63, rookTo: 61),
+        );
       }
       if (castling.contains('q') &&
           _board[59].isEmpty &&
@@ -356,7 +390,9 @@ class ChessEngine {
           _board[56] == 'r' &&
           !_attacked(59, opponent) &&
           !_attacked(58, opponent)) {
-        moves.add(const ChessMove(60, 58, isCastle: true, rookFrom: 56, rookTo: 59));
+        moves.add(
+          const ChessMove(60, 58, isCastle: true, rookFrom: 56, rookTo: 59),
+        );
       }
     }
     return moves;
@@ -374,13 +410,15 @@ class ChessEngine {
     }
     for (final d in _knightDeltas) {
       final f = file + d.$1, r = rank + d.$2;
-      if (_inBounds(f, r) && _board[r * 8 + f] == (byColor == 'w' ? 'N' : 'n')) {
+      if (_inBounds(f, r) &&
+          _board[r * 8 + f] == (byColor == 'w' ? 'N' : 'n')) {
         return true;
       }
     }
     for (final d in _kingDeltas) {
       final f = file + d.$1, r = rank + d.$2;
-      if (_inBounds(f, r) && _board[r * 8 + f] == (byColor == 'w' ? 'K' : 'k')) {
+      if (_inBounds(f, r) &&
+          _board[r * 8 + f] == (byColor == 'w' ? 'K' : 'k')) {
         return true;
       }
     }
@@ -389,7 +427,8 @@ class ChessEngine {
       while (_inBounds(f, r)) {
         final p = _board[r * 8 + f];
         if (p.isNotEmpty) {
-          if (_colorOf(p) == byColor && (p.toUpperCase() == 'B' || p.toUpperCase() == 'Q')) {
+          if (_colorOf(p) == byColor &&
+              (p.toUpperCase() == 'B' || p.toUpperCase() == 'Q')) {
             return true;
           }
           break;
@@ -403,7 +442,8 @@ class ChessEngine {
       while (_inBounds(f, r)) {
         final p = _board[r * 8 + f];
         if (p.isNotEmpty) {
-          if (_colorOf(p) == byColor && (p.toUpperCase() == 'R' || p.toUpperCase() == 'Q')) {
+          if (_colorOf(p) == byColor &&
+              (p.toUpperCase() == 'R' || p.toUpperCase() == 'Q')) {
             return true;
           }
           break;
@@ -423,8 +463,12 @@ class ChessEngine {
   }
 
   void _updateCastlingRights(String piece, int from, int to) {
-    if (piece == 'K') castling = castling.replaceAll('K', '').replaceAll('Q', '');
-    if (piece == 'k') castling = castling.replaceAll('k', '').replaceAll('q', '');
+    if (piece == 'K') {
+      castling = castling.replaceAll('K', '').replaceAll('Q', '');
+    }
+    if (piece == 'k') {
+      castling = castling.replaceAll('k', '').replaceAll('q', '');
+    }
     if (from == 0 || to == 0) castling = castling.replaceAll('Q', '');
     if (from == 7 || to == 7) castling = castling.replaceAll('K', '');
     if (from == 56 || to == 56) castling = castling.replaceAll('q', '');
@@ -432,9 +476,13 @@ class ChessEngine {
   }
 
   bool _insufficientMaterial() {
-    final pieces = _board.where((p) => p.isNotEmpty && p.toUpperCase() != 'K').toList();
+    final pieces = _board
+        .where((p) => p.isNotEmpty && p.toUpperCase() != 'K')
+        .toList();
     if (pieces.isEmpty) return true;
-    if (pieces.length == 1 && (pieces.first.toUpperCase() == 'B' || pieces.first.toUpperCase() == 'N')) {
+    if (pieces.length == 1 &&
+        (pieces.first.toUpperCase() == 'B' ||
+            pieces.first.toUpperCase() == 'N')) {
       return true;
     }
     return false;

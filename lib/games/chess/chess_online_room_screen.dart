@@ -160,8 +160,9 @@ class _ChessOnlineRoomScreenState extends State<ChessOnlineRoomScreen>
 
   Future<void> _move(ChessEngine engine, int from, int to) async {
     final color = _room!.colorFor(cloud.userId);
-    final needsPromotion =
-        engine.movesFrom(from).any((m) => m.to == to && m.promotion != null);
+    final needsPromotion = engine
+        .movesFrom(from)
+        .any((m) => m.to == to && m.promotion != null);
     String? promotion;
     if (needsPromotion) {
       promotion = await askPromotionChoice(context, color!);

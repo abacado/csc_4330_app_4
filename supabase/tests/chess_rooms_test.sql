@@ -66,10 +66,17 @@ begin
   perform set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true);
   room := public.play_chess_move(code, fen_after_black, 'finished', 'white');
   if room->>'winner' <> 'white' or room->>'status' <> 'finished' then raise exception 'Win not stored'; end if;
+  -- Results are private: inspect each outcome as the player who owns it.
+  perform set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', true);
   select count(*) into total from public.game_results where outcome = 'win';
   if total <> 1 then raise exception 'Winner missing result'; end if;
+  select count(*) into total from public.game_results;
+  if total <> 1 then raise exception 'Winner can read another players result'; end if;
+  perform set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true);
   select count(*) into total from public.game_results where outcome = 'loss';
   if total <> 1 then raise exception 'Loser missing result'; end if;
+  select count(*) into total from public.game_results;
+  if total <> 1 then raise exception 'Loser can read another players result'; end if;
   rejected := false;
   begin perform public.play_chess_move(code, fen_start, 'playing', null); exception when others then rejected := true; end;
   if not rejected then raise exception 'Finished match accepted move'; end if;

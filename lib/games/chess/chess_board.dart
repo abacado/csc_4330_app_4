@@ -3,8 +3,18 @@ import 'package:flutter/material.dart';
 import '../../theme/arcade_theme.dart';
 
 const _glyphs = {
-  'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-  'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟',
+  'K': '♔',
+  'Q': '♕',
+  'R': '♖',
+  'B': '♗',
+  'N': '♘',
+  'P': '♙',
+  'k': '♚',
+  'q': '♛',
+  'r': '♜',
+  'b': '♝',
+  'n': '♞',
+  'p': '♟',
 };
 const _lightSquare = Color(0xFF2B3050);
 const _darkSquare = Color(0xFF1C2033);
@@ -43,7 +53,9 @@ class ChessBoard extends StatelessWidget {
           padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: 64,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 8),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 8,
+          ),
           itemBuilder: (context, index) {
             final row = index ~/ 8, col = index % 8;
             final square = squareAt(row, col, flipped);
@@ -74,7 +86,9 @@ class ChessBoard extends StatelessWidget {
                             _glyphs[piece] ?? '',
                             style: TextStyle(
                               fontSize: 40,
-                              color: piece == piece.toUpperCase() ? Colors.white : const Color(0xFF0E0F1A),
+                              color: piece == piece.toUpperCase()
+                                  ? Colors.white
+                                  : const Color(0xFF0E0F1A),
                             ),
                           ),
                         ),
@@ -83,7 +97,9 @@ class ChessBoard extends StatelessWidget {
                           margin: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: arcadeMint.withValues(alpha: piece.isEmpty ? 0.5 : 0.0),
+                            color: arcadeMint.withValues(
+                              alpha: piece.isEmpty ? 0.5 : 0.0,
+                            ),
                             border: piece.isNotEmpty
                                 ? Border.all(color: arcadeMint, width: 3)
                                 : null,
@@ -105,23 +121,24 @@ class ChessBoard extends StatelessWidget {
 }
 
 /// Shows a picker for the four promotion pieces; returns null if dismissed.
-Future<String?> askPromotionChoice(BuildContext context, String color) => showDialog<String>(
-  context: context,
-  builder: (context) => AlertDialog(
-    title: const Text('Promote pawn to'),
-    content: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (final piece in const ['Q', 'R', 'B', 'N'])
-          IconButton(
-            iconSize: 36,
-            onPressed: () => Navigator.pop(context, piece),
-            icon: Text(
-              _glyphs[color == 'white' ? piece : piece.toLowerCase()] ?? '',
-              style: const TextStyle(fontSize: 32),
-            ),
-          ),
-      ],
-    ),
-  ),
-);
+Future<String?> askPromotionChoice(BuildContext context, String color) =>
+    showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Promote pawn to'),
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final piece in const ['Q', 'R', 'B', 'N'])
+              IconButton(
+                iconSize: 36,
+                onPressed: () => Navigator.pop(context, piece),
+                icon: Text(
+                  _glyphs[color == 'white' ? piece : piece.toLowerCase()] ?? '',
+                  style: const TextStyle(fontSize: 32),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );

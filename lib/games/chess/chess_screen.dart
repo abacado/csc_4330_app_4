@@ -45,7 +45,8 @@ class _ChessScreenState extends State<ChessScreen> {
   Future<void> _tap(int square) async {
     if (_botThinking || !_humansTurn || _engine.isFinished) return;
     final piece = _engine.board[square];
-    final ownPiece = piece.isNotEmpty && ChessEngine.colorOf(piece) == _engine.turn;
+    final ownPiece =
+        piece.isNotEmpty && ChessEngine.colorOf(piece) == _engine.turn;
     if (_selected == null) {
       if (ownPiece) {
         setState(() {
@@ -83,7 +84,10 @@ class _ChessScreenState extends State<ChessScreen> {
         .any((m) => m.to == to && m.promotion != null);
     String? promotion;
     if (needsPromotion) {
-      promotion = await askPromotionChoice(context, _engine.turn == 'w' ? 'white' : 'black');
+      promotion = await askPromotionChoice(
+        context,
+        _engine.turn == 'w' ? 'white' : 'black',
+      );
       if (promotion == null || !mounted) return;
     }
     if (!_engine.makeMove(from, to, promotion: promotion)) return;
@@ -226,8 +230,9 @@ class _ChessScreenState extends State<ChessScreen> {
                     ? () => Navigator.push(
                         context,
                         MaterialPageRoute<void>(
-                          builder: (_) =>
-                              ChessOnlineRoomScreen(controller: widget.controller),
+                          builder: (_) => ChessOnlineRoomScreen(
+                            controller: widget.controller,
+                          ),
                         ),
                       )
                     : null,
