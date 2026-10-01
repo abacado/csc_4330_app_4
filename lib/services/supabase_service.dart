@@ -77,4 +77,39 @@ class SupabaseService implements CloudService {
         .timeout(const Duration(seconds: 10));
     return OnlineRoom.fromJson(row);
   }
+
+  @override
+  Future<ChessRoom> createChessRoom() => _chessRpc('create_chess_room', {});
+  @override
+  Future<ChessRoom> joinChessRoom(String code) =>
+      _chessRpc('join_chess_room', {'room_code': code});
+  @override
+  Future<ChessRoom> playChessMove(
+    String code,
+    String fen, {
+    required String status,
+    String? winner,
+  }) => _chessRpc('play_chess_move', {
+    'room_code': code,
+    'new_fen': fen,
+    'new_status': status,
+    'new_winner': winner,
+  });
+  Future<ChessRoom> _chessRpc(String name, Map<String, dynamic> params) async {
+    final row = await client
+        .rpc(name, params: params)
+        .timeout(const Duration(seconds: 15));
+    return ChessRoom.fromJson(Map<String, dynamic>.from(row as Map));
+  }
+
+  @override
+  Future<ChessRoom> getChessRoom(String code) async {
+    final row = await client
+        .from('chess_rooms')
+        .select()
+        .eq('code', code)
+        .single()
+        .timeout(const Duration(seconds: 10));
+    return ChessRoom.fromJson(row);
+  }
 }

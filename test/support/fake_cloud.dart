@@ -65,4 +65,45 @@ class FakeCloud implements CloudService {
     moves.add(cell);
     return room;
   }
+
+  ChessRoom chessRoom = ChessRoom.fromJson({
+    'code': 'ABC123',
+    'host_id': 'host',
+    'guest_id': null,
+    'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+    'status': 'waiting',
+    'winner': null,
+  });
+  String? joinedChessCode;
+  final chessMoves = <String>[];
+  @override
+  Future<ChessRoom> createChessRoom() async {
+    check();
+    return chessRoom;
+  }
+
+  @override
+  Future<ChessRoom> joinChessRoom(String code) async {
+    check();
+    joinedChessCode = code;
+    return chessRoom;
+  }
+
+  @override
+  Future<ChessRoom> getChessRoom(String code) async {
+    check();
+    return chessRoom;
+  }
+
+  @override
+  Future<ChessRoom> playChessMove(
+    String code,
+    String fen, {
+    required String status,
+    String? winner,
+  }) async {
+    check();
+    chessMoves.add(fen);
+    return chessRoom;
+  }
 }

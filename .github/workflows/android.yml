@@ -93,7 +93,7 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p test-results
-          psql -v ON_ERROR_STOP=1 -f supabase/tests/bootstrap.sql -f supabase/setup.sql -f supabase/setup.sql -f supabase/tests/rooms_test.sql 2>&1 | tee test-results/database.txt
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/bootstrap.sql -f supabase/setup.sql -f supabase/setup.sql -f supabase/tests/rooms_test.sql -f supabase/tests/chess_rooms_test.sql 2>&1 | tee test-results/database.txt
       - name: Database job summary
         if: always()
         run: |

@@ -31,6 +31,7 @@ const games = <GameDefinition>[
     color: Color(0xFFFFCA75),
     category: GameCategory.strategy,
     players: '2 players',
+    ready: true,
   ),
   GameDefinition(
     id: 'checkers',
