@@ -52,6 +52,7 @@ const games = <GameDefinition>[
     color: Color(0xFFAB9BFF),
     category: GameCategory.puzzles,
     players: 'Solo',
+    ready: true,
   ),
   GameDefinition(
     id: 'word_search',
@@ -62,6 +63,7 @@ const games = <GameDefinition>[
     color: Color(0xFF75DBFF),
     category: GameCategory.puzzles,
     players: 'Solo',
+    ready: true,
   ),
   GameDefinition(
     id: 'tic_tac_toe',
