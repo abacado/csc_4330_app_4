@@ -24,6 +24,15 @@ flutter run -d chrome
 
 For Android, start an emulator or connect a device and use `flutter run`. Web and Android are the initial verification targets. iOS/macOS require a Mac; other desktop targets retain their Flutter scaffolding but have not been device-tested.
 
+## Publish the website
+
+1. In GitHub repository **Settings > Pages**, set **Source** to **GitHub Actions**.
+2. Under **Settings > Secrets and variables > Actions > Variables**, add repository variables `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` using the values from your local configuration. Use only the publishable client key, never a secret or service-role key.
+3. Commit and push the workflow changes to `main`. Under **Actions > Pocket Arcade CI**, wait for the app, database, and pages jobs to pass.
+4. Open https://abacado.github.io/csc_4330_app_4/ on any device.
+
+Future pushes to `main` update the site after checks pass. You can also select **Run workflow** on `main` in Actions to retry after changing settings. The hosted app connects to the shared Supabase project; visitors do not need source code, VS Code, or a Supabase account. Apply the current `supabase/setup.sql` to that project and enable anonymous sign-ins before testing online play.
+
 ## Team documents
 
 - [Teammate integration guide](docs/TEAM_GUIDE.md)
