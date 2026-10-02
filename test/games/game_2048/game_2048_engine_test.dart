@@ -16,10 +16,13 @@ void expectSlide(List<int> line, List<int> expected, int gained) {
 
 void main() {
   group('slideLine', () {
-    test('Packs tiles toward the leading edge without merging unequal ones', () {
-      expectSlide([0, 2, 0, 4], [2, 4, 0, 0], 0);
-      expectSlide([2, 4, 8, 16], [2, 4, 8, 16], 0);
-    });
+    test(
+      'Packs tiles toward the leading edge without merging unequal ones',
+      () {
+        expectSlide([0, 2, 0, 4], [2, 4, 0, 0], 0);
+        expectSlide([2, 4, 8, 16], [2, 4, 8, 16], 0);
+      },
+    );
 
     test('Merges a pair and scores the merged value', () {
       expectSlide([2, 0, 0, 2], [4, 0, 0, 0], 4);
