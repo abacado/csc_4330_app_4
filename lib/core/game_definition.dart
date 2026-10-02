@@ -88,6 +88,17 @@ const games = <GameDefinition>[
     players: 'Solo',
     ready: true,
   ),
+  GameDefinition(
+    id: 'minesweeper',
+    name: 'Minesweeper',
+    tagline: 'Tread carefully. Clear the board.',
+    instructions: 'Tap a square to reveal it. A number shows how many mines touch that square. Long-press a hidden square to flag a suspected mine. Reveal every safe square to win — reveal a mine and the round ends.',
+    icon: Icons.dangerous_rounded,
+    color: Color(0xFFFFB86B),
+    category: GameCategory.puzzles,
+    players: 'Solo',
+    ready: true,
+  ),
 ];
 
 GameDefinition gameById(String id) => games.firstWhere((game) => game.id == id);
