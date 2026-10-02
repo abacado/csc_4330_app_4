@@ -17,10 +17,9 @@ class Game2048Engine {
 
   /// Uses a fixed starting layout, e.g. in tests. [tiles] must hold exactly
   /// 16 values, each 0 or a power of two from 2 upward.
-  Game2048Engine.fromTiles(List<int> tiles, {Random? random, int score = 0})
+  Game2048Engine.fromTiles(List<int> tiles, {Random? random})
     : _random = random ?? Random(),
-      _tiles = List.of(tiles),
-      _score = score {
+      _tiles = List.of(tiles) {
     if (tiles.length != size * size) {
       throw ArgumentError.value(tiles, 'tiles', 'Need exactly 16 cells.');
     }
