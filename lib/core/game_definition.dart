@@ -42,6 +42,7 @@ const games = <GameDefinition>[
     color: Color(0xFFFF819C),
     category: GameCategory.strategy,
     players: '2 players',
+    ready: true,
   ),
   GameDefinition(
     id: 'sudoku',
@@ -85,6 +86,7 @@ const games = <GameDefinition>[
     color: Color(0xFFF6A5E6),
     category: GameCategory.puzzles,
     players: 'Solo',
+    ready: true,
   ),
 ];
 

@@ -61,21 +61,21 @@ void main() {
     expect(controller.results.length, 1);
   });
 
-  testWidgets('Instructions open and coming-soon game returns to arcade', (
+  testWidgets('Instructions open and a game returns to the arcade', (
     tester,
   ) async {
     await launch(tester);
-    await tester.ensureVisible(find.text('Memory'));
+    await tester.ensureVisible(find.text('Checkers'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Memory'));
+    await tester.tap(find.text('Checkers'));
     await tester.pumpAndSettle();
-    expect(find.text('A new challenge is loading'), findsOneWidget);
+    expect(find.text("Black's turn"), findsOneWidget);
     await tester.tap(find.byTooltip('How to play'));
     await tester.pumpAndSettle();
-    expect(find.text('How to play Memory'), findsOneWidget);
+    expect(find.text('How to play Checkers'), findsOneWidget);
     await tester.tap(find.text('Got it'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Back to the arcade'));
+    await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
     expect(find.text('Arcade'), findsOneWidget);
   });
