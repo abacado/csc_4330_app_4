@@ -1,68 +1,127 @@
 # Pocket Arcade
 
-A retro Flutter game hub for CSC 4330: Chess, Checkers, Sudoku, Word Search, Tic-Tac-Toe, and Memory.
+Six classic games in one retro arcade, built with Flutter for CSC 4330. Play a quick solo puzzle, share a board with a friend, or challenge someone online without creating an account.
 
-## Current framework
+**[Play Pocket Arcade](https://abacado.github.io/csc_4330_app_4/)** · **[GitHub repository](https://github.com/abacado/csc_4330_app_4)**
 
-- Responsive arcade library with category filters, guest name, and activity journal.
-- Shared theme, navigation, instructions, restart controls, and independent game folders.
-- Playable Tic-Tac-Toe reference with local two-player rules and Supabase room integration.
-- Five explicitly labeled starter screens for teammates to implement, including Memory.
-- Optional Supabase anonymous guests, private rooms, and saved results; local play works without configuration.
-- Automated analysis, tests, readable reports, coverage, database checks, web build, and Android APK.
+## Games
 
-This is a framework and integration reference, not six completed games. Online code must be connected and verified against your Supabase project before the demo.
+All six games are implemented and available from the arcade library.
+
+| Game | Modes | Features |
+| --- | --- | --- |
+| Chess | Same-device two-player, vs. bot, online rooms | Legal moves, castling, en passant, promotion, checkmate and draw detection |
+| Checkers | Same-device two-player | Mandatory captures, multiple jumps, kings and win detection |
+| Sudoku | Solo | Difficulty selection, pencil notes, conflict highlighting and completion detection |
+| Word Search | Solo | Generated puzzles, forward/backward and diagonal word selection |
+| Tic-Tac-Toe | Same-device two-player, online rooms | Turn validation, wins, draws and restart |
+| Memory | Solo | Shuffled pairs, match tracking, move counter and restart |
+
+The shared app includes a responsive retro theme, game instructions, category filters, a guest name, and an activity journal of completed games. Local play works without Supabase configuration.
+
+## Play online
+
+Open the website on two devices, or use a normal browser window and a private/incognito window. Two ordinary tabs in the same browser share a guest identity.
+
+1. Open **Chess** or **Tic-Tac-Toe** and choose **Play with a room code**.
+2. One player selects **Create a room** and shares the six-character code.
+3. The other player enters the code and selects **Join room**.
+4. The host plays White in Chess or X in Tic-Tac-Toe. Moves normally appear on the other device within about two seconds.
+
+Keep the room screen open during play. Rooms last 24 hours; rejoin using the same browser/device and code. Create a new room for a rematch. Players do not need a Supabase account or the source code.
 
 ## Run locally
 
-Use Flutter **3.47.2** / Dart **3.13.2**, matching the starter repository and CI.
+Use Flutter **3.47.2** / Dart **3.13.2**, matching the automated build.
+
+### Local play
+
+From the project folder:
 
 ```sh
 flutter pub get
 flutter run -d chrome
 ```
 
-For Android, start an emulator or connect a device and use `flutter run`. Web and Android are the initial verification targets. iOS/macOS require a Mac; other desktop targets retain their Flutter scaffolding but have not been device-tested.
+### With online play and cloud results
 
-## Publish the website
+Copy `config/supabase.example.json` to `config/supabase.local.json` and fill in the shared project's URL and publishable key. The local file is ignored by Git, so teammates need to configure it separately.
 
-1. In GitHub repository **Settings > Pages**, set **Source** to **GitHub Actions**.
-2. Under **Settings > Secrets and variables > Actions > Variables**, add repository variables `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` using the values from your local configuration. Use only the publishable client key, never a secret or service-role key.
-3. Commit and push the workflow changes to `main`. Under **Actions > Pocket Arcade CI**, wait for the app, database, and pages jobs to pass.
-4. Open https://abacado.github.io/csc_4330_app_4/ on any device.
+```sh
+flutter pub get
+flutter run -d chrome --dart-define-from-file=config/supabase.local.json
+```
 
-Future pushes to `main` update the site after checks pass. You can also select **Run workflow** on `main` in Actions to retry after changing settings. The hosted app connects to the shared Supabase project; visitors do not need source code, VS Code, or a Supabase account. Apply the current `supabase/setup.sql` to that project and enable anonymous sign-ins before testing online play.
+In VS Code, open **Run and Debug**, select **Pocket Arcade (Supabase)**, and press **F5**. Select **Pocket Arcade (local only)** for offline configuration. Fully restart after changing configuration; hot reload does not replace compile-time values.
 
-## Team documents
+For Android, connect a device or start an emulator, then replace `chrome` with its ID from `flutter devices`. Web and Android are the build targets verified by CI. Other platform folders are included, but are not a claim of device testing.
 
-- [Teammate integration guide](docs/TEAM_GUIDE.md)
-- [Supabase setup and two-device verification](docs/SUPABASE_SETUP.md)
-- [Public task-board backlog](docs/TASK_BOARD.md)
-- [Demo and submission checklist](docs/DEMO_CHECKLIST.md)
+## Server component
 
-## Structure
+Supabase provides hosted PostgreSQL, anonymous authentication, private game rooms, and saved results. No separate custom server needs to run on a teammate's computer.
+
+The project owner enables anonymous sign-ins and applies `supabase/setup.sql` once to the shared project. Everyone's app connects to that same project. Use only the publishable client key in the app, never a service-role key or database password.
+
+Results save locally first and can sync to the cloud. Row-level security limits access to a guest's own results and rooms. Online rooms poll for updates every two seconds. Tic-Tac-Toe moves are validated by database functions; Chess rules are checked by the Dart engine, while the server enforces room membership and turn order. This is a class-project multiplayer system, not a cheat-proof competitive service.
+
+Guest identities belong to a browser/device. Clearing browser data loses that identity; guest names are not cross-device logins.
+
+See the **[Supabase setup and two-device verification guide](docs/SUPABASE_SETUP.md)** for setup and connection troubleshooting.
+
+## Tests and automated builds
+
+```sh
+dart format --output=none --set-exit-if-changed lib test
+flutter analyze
+flutter test --coverage
+```
+
+Tests cover all six games, invalid actions, wins and completion, restarts, saved results, screen layouts, chess bot decisions, and online-room failure/recovery behavior. Separate SQL tests check database access policies and room rules in an isolated PostgreSQL instance.
+
+Verified locally on **October 2, 2026**: **127 passing Flutter tests** and **92.0% reported line coverage** (1,909 of 2,075 lines). Rerun the commands above for current results after further changes.
+
+Coverage is written to `coverage/lcov.info`. It measures executed lines in the files included in the report, not every possible behavior or the live Supabase service. Online widget tests use a simulated backend; complete the two-device checks before the demo.
+
+In **GitHub → Actions → Pocket Arcade CI**, open a run to see its test summary. Download the test-report/coverage and database-report artifacts for details. CI checks formatting, analysis, Flutter tests, database tests, and web/Android builds. The website deploys from `main` only after the app and database jobs succeed.
+
+## Website deployment
+
+The public website is hosted on GitHub Pages. Future successful pushes to `main` update the same URL.
+
+For repository administrators:
+
+1. Under **Settings → Pages**, set **Source** to **GitHub Actions**.
+2. Under **Settings → Secrets and variables → Actions → Variables**, add `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
+3. Push to `main`, or select **Run workflow** on `main` in Actions.
+4. Wait for the **pages** job to succeed before checking the website.
+
+For a local Android release build with cloud access:
+
+```sh
+flutter build apk --release --dart-define-from-file=config/supabase.local.json
+```
+
+## Project layout
 
 ```text
 lib/
-  core/           Game catalog, result contract, shared controller
-  games/          One folder per game + central screen registry
-  screens/        Arcade library, activity, guest profile
-  services/       Local persistence and optional cloud integration
-  theme/          Shared retro palette and control styles
-  widgets/        Common game screen and starter screen
-supabase/         Database setup and access/rule tests
-config/           Example configuration; local values ignored
+  core/        Game catalog, results and shared controller
+  games/       Rules, boards and screens for all six games
+  screens/     Arcade library, activity journal and player profile
+  services/    Local storage and Supabase integration
+  theme/       Shared retro styling
+  widgets/     Shared game layout and controls
+test/          Flutter logic and widget tests
+supabase/      Database schema, functions and SQL tests
+config/        Example connection configuration
+.github/       Automated build and deployment workflow
 ```
 
-## Check your work
+## Team resources
 
-```sh
-dart format lib test
-flutter analyze
-flutter test --coverage
-flutter build web
-```
+- [Teammate integration guide](docs/TEAM_GUIDE.md)
+- [Supabase setup and multiplayer verification](docs/SUPABASE_SETUP.md)
+- [Task-board planning reference](docs/TASK_BOARD.md)
+- [Demo and submission checklist](docs/DEMO_CHECKLIST.md)
 
-On every push and pull request, GitHub Actions shows a readable per-test summary and attaches JUnit, raw test events, coverage, and database output. Successful builds also attach the web app and release APK. Optional GitHub repository variables enable Supabase in those builds; see the setup guide.
-
-Use meaningful commits and a public task board. The prepared task backlog must still be turned into a public GitHub Project by the team.
+The task-board planning document is a reference, not the public Trello board. Include the team's actual public board URL with the final submission.
