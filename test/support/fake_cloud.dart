@@ -2,6 +2,59 @@ import 'package:csc_4330_app_4/core/game_result.dart';
 import 'package:csc_4330_app_4/services/cloud_service.dart';
 
 class FakeCloud implements CloudService {
+  CheckersRoom checkersRoom = CheckersRoom.fromJson({
+    'code': 'ABC123',
+    'host_id': 'host',
+    'guest_id': null,
+    'board': List.generate(
+      64,
+      (i) => ((i ~/ 8 + i % 8).isOdd)
+          ? (i < 24
+                ? 1
+                : i >= 40
+                ? -1
+                : 0)
+          : 0,
+    ),
+    'turn': 'black',
+    'status': 'waiting',
+    'winner': null,
+    'jumper': null,
+    'revision': 0,
+  });
+  String? joinedCheckersCode;
+  final checkersMoves = <List<int>>[];
+  @override
+  Future<CheckersRoom> createCheckersRoom() async {
+    check();
+    return checkersRoom;
+  }
+
+  @override
+  Future<CheckersRoom> joinCheckersRoom(String code) async {
+    check();
+    joinedCheckersCode = code;
+    return checkersRoom;
+  }
+
+  @override
+  Future<CheckersRoom> getCheckersRoom(String code) async {
+    check();
+    return checkersRoom;
+  }
+
+  @override
+  Future<CheckersRoom> playCheckersMove(
+    String code,
+    int from,
+    int to,
+    int revision,
+  ) async {
+    check();
+    checkersMoves.add([from, to, revision]);
+    return checkersRoom;
+  }
+
   bool fail = false;
   final saved = <String, GameResult>{};
   final moves = <int>[];

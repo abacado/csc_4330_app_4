@@ -58,6 +58,25 @@ class CheckersEngine {
   }
 
   final List<Piece?> _board;
+
+  /// Restore a server-authoritative board, including a pending multiple jump.
+  factory CheckersEngine.fromOnline(List<int> board, String turn, int? jumper) {
+    if (board.length != 64 ||
+        board.any((p) => ![-2, -1, 0, 1, 2].contains(p))) {
+      throw ArgumentError('Invalid checkers board');
+    }
+    if (turn != 'black' && turn != 'red') throw ArgumentError('Invalid turn');
+    final game = CheckersEngine.fromPieces({
+      for (var i = 0; i < 64; i++)
+        if (board[i] != 0)
+          i: Piece(
+            board[i] > 0 ? Side.black : Side.red,
+            king: board[i].abs() == 2,
+          ),
+    }, turn: turn == 'black' ? Side.black : Side.red);
+    game._jumper = jumper;
+    return game;
+  }
   Side _turn;
   int? _jumper;
   int _moveCount = 0;

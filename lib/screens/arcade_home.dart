@@ -15,6 +15,7 @@ class ArcadeHome extends StatefulWidget {
 class _ArcadeHomeState extends State<ArcadeHome> {
   int _tab = 0;
   GameCategory? _category;
+  bool _onlineOnly = false;
   ArcadeController get controller => widget.controller;
 
   void _open(String id) => Navigator.of(
@@ -135,7 +136,11 @@ class _ArcadeHomeState extends State<ArcadeHome> {
 
   Widget _library() {
     final visible = games
-        .where((game) => _category == null || game.category == _category)
+        .where(
+          (game) => _onlineOnly
+              ? game.online
+              : _category == null || game.category == _category,
+        )
         .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,20 +221,32 @@ class _ArcadeHomeState extends State<ArcadeHome> {
               children: [
                 ChoiceChip(
                   label: const Text('All games'),
-                  selected: _category == null,
-                  onSelected: (_) => setState(() => _category = null),
+                  selected: !_onlineOnly && _category == null,
+                  onSelected: (_) => setState(() {
+                    _onlineOnly = false;
+                    _category = null;
+                  }),
                 ),
                 ChoiceChip(
                   label: const Text('Strategy'),
-                  selected: _category == GameCategory.strategy,
-                  onSelected: (_) =>
-                      setState(() => _category = GameCategory.strategy),
+                  selected: !_onlineOnly && _category == GameCategory.strategy,
+                  onSelected: (_) => setState(() {
+                    _onlineOnly = false;
+                    _category = GameCategory.strategy;
+                  }),
                 ),
                 ChoiceChip(
                   label: const Text('Puzzles'),
-                  selected: _category == GameCategory.puzzles,
-                  onSelected: (_) =>
-                      setState(() => _category = GameCategory.puzzles),
+                  selected: !_onlineOnly && _category == GameCategory.puzzles,
+                  onSelected: (_) => setState(() {
+                    _onlineOnly = false;
+                    _category = GameCategory.puzzles;
+                  }),
+                ),
+                ChoiceChip(
+                  label: const Text('Online'),
+                  selected: _onlineOnly,
+                  onSelected: (_) => setState(() => _onlineOnly = true),
                 ),
               ],
             ),

@@ -40,6 +40,15 @@ class ChessRoom {
 }
 
 abstract class CloudService {
+  Future<CheckersRoom> createCheckersRoom();
+  Future<CheckersRoom> joinCheckersRoom(String code);
+  Future<CheckersRoom> getCheckersRoom(String code);
+  Future<CheckersRoom> playCheckersMove(
+    String code,
+    int from,
+    int to,
+    int revision,
+  );
   String get userId;
   Future<void> connect();
   Future<void> saveResults(List<GameResult> results);
@@ -57,4 +66,27 @@ abstract class CloudService {
     required String status,
     String? winner,
   });
+}
+
+class CheckersRoom {
+  CheckersRoom.fromJson(Map<String, dynamic> json)
+    : code = json['code'] as String,
+      hostId = json['host_id'] as String,
+      guestId = json['guest_id'] as String?,
+      board = List<int>.from(json['board'] as List),
+      turn = json['turn'] as String,
+      status = json['status'] as String,
+      winner = json['winner'] as String?,
+      jumper = json['jumper'] as int?,
+      revision = json['revision'] as int;
+  final String code, hostId, turn, status;
+  final String? guestId, winner;
+  final List<int> board;
+  final int? jumper;
+  final int revision;
+  String? colorFor(String userId) => userId == hostId
+      ? 'black'
+      : userId == guestId
+      ? 'red'
+      : null;
 }

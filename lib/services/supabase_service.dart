@@ -17,6 +17,45 @@ class SupabaseService implements CloudService {
   @override
   String get userId => client.auth.currentUser!.id;
   @override
+  Future<CheckersRoom> createCheckersRoom() =>
+      _checkersRpc('create_checkers_room', {});
+  @override
+  Future<CheckersRoom> joinCheckersRoom(String code) =>
+      _checkersRpc('join_checkers_room', {'room_code': code});
+  @override
+  Future<CheckersRoom> playCheckersMove(
+    String code,
+    int from,
+    int to,
+    int revision,
+  ) => _checkersRpc('play_checkers_move', {
+    'room_code': code,
+    'from_square': from,
+    'to_square': to,
+    'expected_revision': revision,
+  });
+  Future<CheckersRoom> _checkersRpc(
+    String name,
+    Map<String, dynamic> params,
+  ) async {
+    final row = await client
+        .rpc(name, params: params)
+        .timeout(const Duration(seconds: 15));
+    return CheckersRoom.fromJson(Map<String, dynamic>.from(row as Map));
+  }
+
+  @override
+  Future<CheckersRoom> getCheckersRoom(String code) async {
+    final row = await client
+        .from('checkers_rooms')
+        .select()
+        .eq('code', code)
+        .single()
+        .timeout(const Duration(seconds: 10));
+    return CheckersRoom.fromJson(row);
+  }
+
+  @override
   Future<void> connect() async {
     if (_client == null) {
       await Supabase.initialize(url: url, publishableKey: key);

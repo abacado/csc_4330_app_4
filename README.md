@@ -11,22 +11,22 @@ All six games are implemented and available from the arcade library.
 | Game | Modes | Features |
 | --- | --- | --- |
 | Chess | Same-device two-player, vs. bot, online rooms | Legal moves, castling, en passant, promotion, checkmate and draw detection |
-| Checkers | Same-device two-player | Mandatory captures, multiple jumps, kings and win detection |
+| Checkers | Same-device two-player, online rooms | Mandatory captures, multiple jumps, kings and win detection |
 | Sudoku | Solo | Difficulty selection, pencil notes, conflict highlighting and completion detection |
 | Word Search | Solo | Generated puzzles, forward/backward and diagonal word selection |
 | Tic-Tac-Toe | Same-device two-player, online rooms | Turn validation, wins, draws and restart |
 | Memory | Solo | Shuffled pairs, match tracking, move counter and restart |
 
-The shared app includes a responsive retro theme, game instructions, category filters, a guest name, and an activity journal of completed games. Local play works without Supabase configuration.
+The shared app includes a responsive retro theme, game instructions, Strategy, Puzzles, and Online filters, a guest name, and an activity journal of completed games. Local play works without Supabase configuration.
 
 ## Play online
 
 Open the website on two devices, or use a normal browser window and a private/incognito window. Two ordinary tabs in the same browser share a guest identity.
 
-1. Open **Chess** or **Tic-Tac-Toe** and choose **Play with a room code**.
+1. Open **Chess**, **Checkers**, or **Tic-Tac-Toe** and choose **Play with a room code**.
 2. One player selects **Create a room** and shares the six-character code.
 3. The other player enters the code and selects **Join room**.
-4. The host plays White in Chess or X in Tic-Tac-Toe. Moves normally appear on the other device within about two seconds.
+4. The host plays White in Chess, Black in Checkers, or X in Tic-Tac-Toe. Moves normally appear on the other device within about two seconds.
 
 Keep the room screen open during play. Rooms last 24 hours; rejoin using the same browser/device and code. Create a new room for a rematch. Players do not need a Supabase account or the source code.
 
@@ -60,9 +60,9 @@ For Android, connect a device or start an emulator, then replace `chrome` with i
 
 Supabase provides hosted PostgreSQL, anonymous authentication, private game rooms, and saved results. No separate custom server needs to run on a teammate's computer.
 
-The project owner enables anonymous sign-ins and applies `supabase/setup.sql` once to the shared project. Everyone's app connects to that same project. Use only the publishable client key in the app, never a service-role key or database password.
+The project owner enables anonymous sign-ins and applies `supabase/setup.sql` to the shared project. **For the Checkers online update, rerun the entire current script in Supabase SQL Editor before using Checkers rooms.** It preserves existing player data and adds the new room table and functions. Everyone's app connects to that same project. Use only the publishable client key in the app, never a service-role key or database password.
 
-Results save locally first and can sync to the cloud. Row-level security limits access to a guest's own results and rooms. Online rooms poll for updates every two seconds. Tic-Tac-Toe moves are validated by database functions; Chess rules are checked by the Dart engine, while the server enforces room membership and turn order. This is a class-project multiplayer system, not a cheat-proof competitive service.
+Results save locally first and can sync to the cloud. Row-level security limits access to a guest's own results and rooms. Online rooms poll for updates every two seconds. Tic-Tac-Toe and Checkers moves are validated by database functions (including forced captures and multiple jumps in Checkers); Chess rules are checked by the Dart engine, while the server enforces room membership and turn order. This is a class-project multiplayer system, not a cheat-proof competitive service.
 
 Guest identities belong to a browser/device. Clearing browser data loses that identity; guest names are not cross-device logins.
 
@@ -78,7 +78,7 @@ flutter test --coverage
 
 Tests cover all six games, invalid actions, wins and completion, restarts, saved results, screen layouts, chess bot decisions, and online-room failure/recovery behavior. Separate SQL tests check database access policies and room rules in an isolated PostgreSQL instance.
 
-Verified locally on **October 2, 2026**: **127 passing Flutter tests** and **92.0% reported line coverage** (1,909 of 2,075 lines). Rerun the commands above for current results after further changes.
+Verified locally on **October 2, 2026**: **142 passing Flutter tests** and **89.0% reported line coverage** (2,098 of 2,357 lines). Rerun the commands above for current results after further changes.
 
 Coverage is written to `coverage/lcov.info`. It measures executed lines in the files included in the report, not every possible behavior or the live Supabase service. Online widget tests use a simulated backend; complete the two-device checks before the demo.
 

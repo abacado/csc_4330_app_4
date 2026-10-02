@@ -40,6 +40,30 @@ void main() {
     expect(find.text('Sudoku'), findsOneWidget);
   });
 
+  testWidgets('Online filter shows only room-code games and can be cleared', (
+    tester,
+  ) async {
+    await launch(tester);
+    await tester.ensureVisible(find.text('Online'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Online'));
+    await tester.pumpAndSettle();
+    for (final name in ['Chess', 'Checkers', 'Tic-Tac-Toe']) {
+      expect(find.text(name), findsOneWidget);
+    }
+    for (final name in ['Memory', 'Sudoku', 'Word Search']) {
+      expect(find.text(name), findsNothing);
+    }
+    await tester.tap(find.text('Puzzles'));
+    await tester.pumpAndSettle();
+    expect(find.text('Memory'), findsOneWidget);
+    expect(find.text('Checkers'), findsNothing);
+    await tester.tap(find.text('All games'));
+    await tester.pumpAndSettle();
+    expect(find.text('Checkers'), findsOneWidget);
+    expect(find.text('Memory'), findsOneWidget);
+  });
+
   testWidgets('A local winning round is saved once and can be restarted', (
     tester,
   ) async {
