@@ -19,8 +19,7 @@ class _ChessReplayScreenState extends State<ChessReplayScreen> {
   List<String> get _fens => widget.result.moves!;
   int get _lastPly => _fens.length - 1;
 
-  void _goTo(int ply) =>
-      setState(() => _ply = ply.clamp(0, _lastPly));
+  void _goTo(int ply) => setState(() => _ply = ply.clamp(0, _lastPly));
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +46,7 @@ class _ChessReplayScreenState extends State<ChessReplayScreen> {
                     board: engine.board,
                     onTap: null,
                     checkSquare: engine.isCheck
-                        ? engine.board.indexOf(
-                            engine.turn == 'w' ? 'K' : 'k',
-                          )
+                        ? engine.board.indexOf(engine.turn == 'w' ? 'K' : 'k')
                         : null,
                   ),
                   const SizedBox(height: 12),

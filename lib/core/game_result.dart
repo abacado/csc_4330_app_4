@@ -9,6 +9,7 @@ class GameResult {
   });
   final String id, gameId, outcome, mode;
   final DateTime completedAt;
+
   /// FEN position after each ply, starting with the opening position.
   /// Only populated for games that support move-by-move review (chess).
   final List<String>? moves;
