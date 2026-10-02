@@ -168,18 +168,48 @@ class SudokuEngine {
   SudokuEngine(this.puzzle) : _values = List.of(puzzle.givens);
   final SudokuPuzzle puzzle;
   final List<int> _values;
+  final List<Set<int>> _notes = List.generate(81, (_) => <int>{});
 
   List<int> get values => List.unmodifiable(_values);
   bool isGiven(int cell) => puzzle.givens[cell] != 0;
-  bool get hasProgress =>
-      List.generate(81, (i) => i).any((i) => !isGiven(i) && _values[i] != 0);
+  bool get hasProgress => List.generate(
+    81,
+    (i) => i,
+  ).any((i) => (!isGiven(i) && _values[i] != 0) || _notes[i].isNotEmpty);
+
+  /// The pencil marks the player has jotted in [cell].
+  Set<int> notesAt(int cell) => Set.unmodifiable(_notes[cell]);
 
   /// Places [digit] (1–9), or clears the cell when [digit] is 0. Returns false
-  /// for clues, finished puzzles, and invalid input.
+  /// for clues, finished puzzles, and invalid input. Placing a digit wipes the
+  /// cell's notes and crosses that digit off the notes of its peers.
   bool setValue(int cell, int digit) {
     if (cell < 0 || cell >= 81 || digit < 0 || digit > 9) return false;
     if (isGiven(cell) || isSolved || _values[cell] == digit) return false;
     _values[cell] = digit;
+    if (digit != 0) {
+      _notes[cell].clear();
+      for (final p in peers[cell]) {
+        _notes[p].remove(digit);
+      }
+    }
+    return true;
+  }
+
+  /// Adds or removes [digit] as a pencil mark in an empty, non-clue [cell].
+  bool toggleNote(int cell, int digit) {
+    if (cell < 0 || cell >= 81 || digit < 1 || digit > 9) return false;
+    if (isGiven(cell) || isSolved || _values[cell] != 0) return false;
+    if (!_notes[cell].remove(digit)) _notes[cell].add(digit);
+    return true;
+  }
+
+  /// Removes every pencil mark from [cell]. Returns false if there were none.
+  bool clearNotes(int cell) {
+    if (cell < 0 || cell >= 81 || _notes[cell].isEmpty || isSolved) {
+      return false;
+    }
+    _notes[cell].clear();
     return true;
   }
 

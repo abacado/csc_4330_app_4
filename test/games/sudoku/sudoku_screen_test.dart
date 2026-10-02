@@ -88,6 +88,42 @@ void main() {
     expect(cellText(tester, 2), '');
   });
 
+  testWidgets('Notes can be pencilled in, erased, and replaced by a number', (
+    tester,
+  ) async {
+    await launch(tester);
+    List<String> notes(int cell) => [
+      for (final e
+          in find
+              .descendant(
+                of: find.byKey(ValueKey('sudoku-notes-$cell')),
+                matching: find.byType(Text),
+              )
+              .evaluate())
+        (e.widget as Text).data!,
+    ];
+
+    await tapKey(tester, 'sudoku-notes-toggle');
+    expect(find.text('Notes on'), findsOneWidget);
+    await tapKey(tester, 'sudoku-cell-2');
+    await tapKey(tester, 'sudoku-digit-4');
+    await tapKey(tester, 'sudoku-digit-6');
+    await tapKey(tester, 'sudoku-cell-3');
+    await tapKey(tester, 'sudoku-digit-4');
+    await tapKey(tester, 'sudoku-digit-6');
+    expect(notes(2), ['4', '6']);
+    expect(notes(3), ['4', '6']);
+
+    await tapKey(tester, 'sudoku-erase'); // clears cell 3's notes
+    expect(notes(3), isEmpty);
+
+    await tapKey(tester, 'sudoku-notes-toggle');
+    await tapKey(tester, 'sudoku-cell-2');
+    await tapKey(tester, 'sudoku-digit-4');
+    expect(notes(2), isEmpty);
+    expect(cellText(tester, 2), '4');
+  });
+
   testWidgets('Clue squares cannot be changed', (tester) async {
     await launch(tester);
     await tapKey(tester, 'sudoku-cell-0');

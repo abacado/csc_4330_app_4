@@ -66,6 +66,30 @@ void main() {
     expect(game.conflicts, isEmpty);
   });
 
+  test('Notes toggle on empty cells and clear when a number is placed', () {
+    final game = SudokuEngine(SudokuPuzzle.parse(classic));
+    expect(game.toggleNote(0, 1), isFalse); // clue
+    expect(game.toggleNote(2, 0), isFalse);
+    expect(game.toggleNote(2, 4), isTrue);
+    expect(game.toggleNote(2, 1), isTrue);
+    expect(game.toggleNote(3, 4), isTrue); // same row as cell 2
+    expect(game.toggleNote(3, 6), isTrue);
+    expect(game.notesAt(2), {1, 4});
+    expect(game.hasProgress, isTrue);
+
+    expect(game.toggleNote(2, 1), isTrue);
+    expect(game.notesAt(2), {4});
+
+    expect(game.setValue(2, 4), isTrue);
+    expect(game.notesAt(2), isEmpty);
+    expect(game.notesAt(3), {6}); // the placed 4 is crossed off its peers
+    expect(game.toggleNote(2, 7), isFalse); // cell is filled
+
+    expect(game.clearNotes(3), isTrue);
+    expect(game.clearNotes(3), isFalse);
+    expect(game.notesAt(3), isEmpty);
+  });
+
   test('Filling in the solution completes the puzzle and locks it', () {
     final puzzle = SudokuPuzzle.parse(classic);
     final game = SudokuEngine(puzzle);

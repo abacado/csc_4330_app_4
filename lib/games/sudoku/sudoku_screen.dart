@@ -27,6 +27,7 @@ class _SudokuScreenState extends State<SudokuScreen> {
   late SudokuEngine _engine = _freshEngine();
   String _resultId = const Uuid().v4();
   int? _selected;
+  bool _notesMode = false;
 
   SudokuEngine _freshEngine() => SudokuEngine(
     widget.newPuzzle?.call(_difficulty) ?? SudokuPuzzle.generate(_difficulty),
@@ -34,7 +35,16 @@ class _SudokuScreenState extends State<SudokuScreen> {
 
   void _enter(int digit) {
     final cell = _selected;
-    if (cell == null || !_engine.setValue(cell, digit)) return;
+    if (cell == null) return;
+    if (digit == 0 && _engine.values[cell] == 0) {
+      if (_engine.clearNotes(cell)) setState(() {});
+      return;
+    }
+    if (_notesMode && digit != 0) {
+      if (_engine.toggleNote(cell, digit)) setState(() {});
+      return;
+    }
+    if (!_engine.setValue(cell, digit)) return;
     setState(() {});
     if (_engine.isSolved) {
       _selected = null;
@@ -105,6 +115,8 @@ class _SudokuScreenState extends State<SudokuScreen> {
                 ? 'Something repeats — check the red squares.'
                 : _selected == null
                 ? 'Pick a square to begin.'
+                : _notesMode
+                ? 'Jot down a possible number.'
                 : 'Choose a number.',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineSmall,
@@ -142,10 +154,13 @@ class _SudokuScreenState extends State<SudokuScreen> {
               onDigit: _selected == null || _engine.isGiven(_selected!)
                   ? null
                   : _enter,
+              notesMode: _notesMode,
+              onToggleNotes: () => setState(() => _notesMode = !_notesMode),
             ),
           const SizedBox(height: 12),
           const Text(
-            'Gray numbers are clues and cannot be changed.',
+            'Gray numbers are clues and cannot be changed. '
+            'Turn on Notes to pencil in numbers you are unsure of.',
             textAlign: TextAlign.center,
             style: TextStyle(color: arcadeMuted, fontSize: 12),
           ),

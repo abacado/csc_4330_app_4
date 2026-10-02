@@ -67,12 +67,13 @@ class SudokuBoard extends StatelessWidget {
     final sameNumber = value != 0 && value == selectedValue;
     final given = engine.isGiven(cell);
     final conflict = conflicts.contains(cell);
+    final notes = value == 0 ? engine.notesAt(cell) : const <int>{};
     final thin = BorderSide(color: arcadeMuted.withValues(alpha: 0.25));
     final thick = BorderSide(color: accent.withValues(alpha: 0.8), width: 2);
     return Semantics(
       button: true,
       label:
-          'Row ${row + 1}, column ${col + 1}, ${value == 0 ? 'empty' : value}${given ? ', clue' : ''}${conflict ? ', conflict' : ''}',
+          'Row ${row + 1}, column ${col + 1}, ${value == 0 ? 'empty' : value}${given ? ', clue' : ''}${conflict ? ', conflict' : ''}${notes.isEmpty ? '' : ', notes ${(notes.toList()..sort()).join(' ')}'}',
       child: GestureDetector(
         key: ValueKey('sudoku-cell-$cell'),
         behavior: HitTestBehavior.opaque,
@@ -95,7 +96,7 @@ class SudokuBoard extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: value == 0
-              ? null
+              ? (notes.isEmpty ? null : _notesGrid(cell, notes, selectedValue))
               : FittedBox(
                   child: Padding(
                     padding: const EdgeInsets.all(4),
@@ -117,6 +118,40 @@ class SudokuBoard extends StatelessWidget {
       ),
     );
   }
+
+  /// Pencil marks laid out in a 3×3 grid, each digit in its keypad position.
+  Widget _notesGrid(int cell, Set<int> notes, int selectedValue) => Padding(
+    key: ValueKey('sudoku-notes-$cell'),
+    padding: const EdgeInsets.all(2),
+    child: Column(
+      children: [
+        for (var r = 0; r < 3; r++)
+          Expanded(
+            child: Row(
+              children: [
+                for (var c = 0; c < 3; c++)
+                  Expanded(
+                    child: notes.contains(r * 3 + c + 1)
+                        ? FittedBox(
+                            child: Text(
+                              '${r * 3 + c + 1}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: r * 3 + c + 1 == selectedValue
+                                    ? accent
+                                    : arcadeMuted,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+              ],
+            ),
+          ),
+      ],
+    ),
+  );
 }
 
 class SudokuNumberPad extends StatelessWidget {
@@ -124,11 +159,17 @@ class SudokuNumberPad extends StatelessWidget {
     super.key,
     required this.engine,
     required this.onDigit,
+    required this.notesMode,
+    required this.onToggleNotes,
   });
   final SudokuEngine engine;
 
   /// Receives 1–9, or 0 to erase. Null disables the pad.
   final ValueChanged<int>? onDigit;
+
+  /// Whether digits are pencilled in as notes rather than placed.
+  final bool notesMode;
+  final VoidCallback onToggleNotes;
 
   @override
   Widget build(BuildContext context) => ConstrainedBox(
@@ -174,6 +215,25 @@ class SudokuNumberPad extends StatelessWidget {
             icon: const Icon(Icons.backspace_outlined, size: 18),
             label: const Text('Erase'),
           ),
+        ),
+        SizedBox(
+          width: 96,
+          height: 52,
+          child: notesMode
+              ? FilledButton.icon(
+                  key: const ValueKey('sudoku-notes-toggle'),
+                  style: FilledButton.styleFrom(padding: EdgeInsets.zero),
+                  onPressed: onToggleNotes,
+                  icon: const Icon(Icons.edit, size: 18),
+                  label: const Text('Notes on'),
+                )
+              : OutlinedButton.icon(
+                  key: const ValueKey('sudoku-notes-toggle'),
+                  style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+                  onPressed: onToggleNotes,
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  label: const Text('Notes'),
+                ),
         ),
       ],
     ),
