@@ -1,3 +1,4 @@
+import 'package:csc_4330_app_4/games/checkers/checkers_online_room_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,8 +12,10 @@ import 'package:csc_4330_app_4/services/local_store.dart';
 import 'support/fake_cloud.dart';
 
 void main() {
-  for (final chess in [false, true]) {
-    group(chess ? 'Chess recovery' : 'Tic-Tac-Toe recovery', () {
+  for (final game in ['tic_tac_toe', 'chess', 'checkers']) {
+    final chess = game == 'chess';
+    final checkers = game == 'checkers';
+    group('$game recovery', () {
       late FakeCloud cloud;
       late ArcadeController controller;
 
@@ -26,7 +29,9 @@ void main() {
         await controller.connect();
         await tester.pumpWidget(
           MaterialApp(
-            home: chess
+            home: checkers
+                ? CheckersOnlineRoomScreen(controller: controller)
+                : chess
                 ? ChessOnlineRoomScreen(controller: controller)
                 : OnlineRoomScreen(controller: controller),
           ),
@@ -46,6 +51,13 @@ void main() {
         };
         cloud.room = OnlineRoom.fromJson(json);
         cloud.chessRoom = ChessRoom.fromJson(json);
+        cloud.checkersRoom = CheckersRoom.fromJson({
+          ...json,
+          'board': cloud.checkersRoom.board,
+          'turn': 'black',
+          'jumper': null,
+          'revision': 0,
+        });
       }
 
       Future<void> create(WidgetTester tester) async {
@@ -81,7 +93,13 @@ void main() {
         await tester.pump();
         expect(find.textContaining('Connection interrupted.'), findsNothing);
         expect(
-          find.text(chess ? 'Your move — White' : 'Your move — X'),
+          find.text(
+            checkers
+                ? 'Your move — Black'
+                : chess
+                ? 'Your move — White'
+                : 'Your move — X',
+          ),
           findsOneWidget,
         );
         await tester.pumpWidget(const SizedBox());
@@ -122,9 +140,13 @@ void main() {
         setRoom();
         await create(tester);
         cloud.fail = true;
-        if (chess) {
-          final from = find.byKey(const ValueKey('square-12'));
-          final to = find.byKey(const ValueKey('square-28'));
+        if (chess || checkers) {
+          final from = find.byKey(
+            ValueKey(checkers ? 'checkers-square-17' : 'square-12'),
+          );
+          final to = find.byKey(
+            ValueKey(checkers ? 'checkers-square-24' : 'square-28'),
+          );
           await tester.ensureVisible(from);
           await tester.tap(from);
           await tester.pump();
@@ -142,7 +164,13 @@ void main() {
         await tester.pump();
         expect(find.textContaining('Move not confirmed.'), findsNothing);
         expect(
-          find.text(chess ? 'Your move — White' : 'Your move — X'),
+          find.text(
+            checkers
+                ? 'Your move — Black'
+                : chess
+                ? 'Your move — White'
+                : 'Your move — X',
+          ),
           findsOneWidget,
         );
         await tester.pumpWidget(const SizedBox());
@@ -162,7 +190,13 @@ void main() {
         );
         await tester.pump();
         expect(
-          find.text(chess ? 'Your move — White' : 'Your move — X'),
+          find.text(
+            checkers
+                ? 'Your move — Black'
+                : chess
+                ? 'Your move — White'
+                : 'Your move — X',
+          ),
           findsOneWidget,
         );
         await tester.pumpWidget(const SizedBox());
@@ -179,8 +213,16 @@ void main() {
               winner: outcome == 'draw'
                   ? null
                   : outcome == 'win'
-                  ? (chess ? 'white' : 'X')
-                  : (chess ? 'black' : 'O'),
+                  ? (checkers
+                        ? 'black'
+                        : chess
+                        ? 'white'
+                        : 'X')
+                  : (checkers
+                        ? 'red'
+                        : chess
+                        ? 'black'
+                        : 'O'),
             );
             await tester.pump(const Duration(seconds: 2));
             await tester.pumpAndSettle();

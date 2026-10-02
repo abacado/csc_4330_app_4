@@ -9,6 +9,7 @@ import '../../core/game_result.dart';
 import '../../theme/arcade_theme.dart';
 import '../../widgets/game_scaffold.dart';
 import 'checkers_board.dart';
+import 'checkers_online_room_screen.dart';
 import 'checkers_engine.dart';
 
 class CheckersScreen extends StatefulWidget {
@@ -158,6 +159,45 @@ class _CheckersScreenState extends State<CheckersScreen> {
             key: const ValueKey('checkers-hint'),
             textAlign: TextAlign.center,
             style: const TextStyle(color: arcadeMuted, fontSize: 12),
+          ),
+          ListenableBuilder(
+            listenable: widget.controller,
+            builder: (context, _) => Column(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: widget.controller.status == CloudStatus.connected
+                      ? () => Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => CheckersOnlineRoomScreen(
+                              controller: widget.controller,
+                            ),
+                          ),
+                        )
+                      : null,
+                  icon: const Icon(Icons.public),
+                  label: const Text('Play with a room code'),
+                ),
+                if (widget.controller.status != CloudStatus.connected)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Text(
+                      'Online rooms unlock when the cloud is connected.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: arcadeMuted, fontSize: 12),
+                    ),
+                  ),
+                if (widget.controller.notice != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      widget.controller.notice!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: arcadeMuted),
+                    ),
+                  ),
+              ],
+            ),
           ),
           if (over) ...[
             const SizedBox(height: 16),

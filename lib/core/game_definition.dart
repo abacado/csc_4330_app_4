@@ -13,17 +13,19 @@ class GameDefinition {
     required this.category,
     required this.players,
     this.ready = false,
+    this.online = false,
   });
   final String id, name, tagline, instructions, players;
   final IconData icon;
   final Color color;
   final GameCategory category;
-  final bool ready;
+  final bool ready, online;
 }
 
 const games = <GameDefinition>[
   GameDefinition(
     id: 'chess',
+    online: true,
     name: 'Chess',
     tagline: 'Think ahead. Rule the board.',
     instructions: 'Take turns moving one piece. Protect your king and checkmate your opponent. White moves first.',
@@ -35,6 +37,7 @@ const games = <GameDefinition>[
   ),
   GameDefinition(
     id: 'checkers',
+    online: true,
     name: 'Checkers',
     tagline: 'Small moves. Big comebacks.',
     instructions: 'Move diagonally across the dark squares. Jump opposing pieces to capture them and reach the far edge to become a king.',
@@ -68,6 +71,7 @@ const games = <GameDefinition>[
   ),
   GameDefinition(
     id: 'tic_tac_toe',
+    online: true,
     name: 'Tic-Tac-Toe',
     tagline: 'Three in a row. One more round.',
     instructions: 'X goes first. Take turns choosing an empty square. Connect three marks across, down, or diagonally to win. A full board without a winner is a draw.',
