@@ -10,6 +10,7 @@ create table if not exists public.game_results (
   mode text not null check (mode in ('solo','local','online')),
   completed_at timestamptz not null default now()
 );
+alter table public.game_results add column if not exists moves jsonb;
 create index if not exists game_results_user_time on public.game_results(user_id, completed_at desc);
 alter table public.game_results enable row level security;
 revoke all on public.game_results from anon, authenticated;

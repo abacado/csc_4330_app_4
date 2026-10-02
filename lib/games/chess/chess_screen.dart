@@ -11,6 +11,7 @@ import '../../widgets/game_scaffold.dart';
 import 'chess_bot.dart';
 import 'chess_board.dart';
 import 'chess_engine.dart';
+import 'chess_history_screen.dart';
 import 'chess_online_room_screen.dart';
 
 class ChessScreen extends StatefulWidget {
@@ -28,6 +29,7 @@ class _ChessScreenState extends State<ChessScreen> {
   int? _selected;
   Set<int> _targets = {};
   String _resultId = const Uuid().v4();
+  List<String> _fenHistory = [kChessInitialFen];
 
   bool get _humansTurn => !(_vsBot && _engine.turn == 'b');
 
@@ -39,6 +41,7 @@ class _ChessScreenState extends State<ChessScreen> {
       _selected = null;
       _targets = {};
       _resultId = const Uuid().v4();
+      _fenHistory = [kChessInitialFen];
     });
   }
 
@@ -94,6 +97,7 @@ class _ChessScreenState extends State<ChessScreen> {
     setState(() {
       _selected = null;
       _targets = {};
+      _fenHistory = [..._fenHistory, _engine.toFen()];
     });
     await _afterMove();
   }
@@ -107,7 +111,10 @@ class _ChessScreenState extends State<ChessScreen> {
       setState(() => _botThinking = true);
       final move = await _bot.chooseMove(_engine);
       if (!mounted) return;
-      if (move != null) _engine.applyMove(move);
+      if (move != null) {
+        _engine.applyMove(move);
+        _fenHistory = [..._fenHistory, _engine.toFen()];
+      }
       setState(() => _botThinking = false);
       if (_engine.isFinished) await _recordResult();
     }
@@ -127,6 +134,7 @@ class _ChessScreenState extends State<ChessScreen> {
           outcome: outcome,
           mode: 'local',
           completedAt: DateTime.now(),
+          moves: _fenHistory,
         ),
       ),
     );
@@ -159,6 +167,7 @@ class _ChessScreenState extends State<ChessScreen> {
       _targets = {};
       _botThinking = false;
       _resultId = const Uuid().v4();
+      _fenHistory = [kChessInitialFen];
     });
   }
 
@@ -225,6 +234,18 @@ class _ChessScreenState extends State<ChessScreen> {
           listenable: widget.controller,
           builder: (context, _) => Column(
             children: [
+              OutlinedButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        ChessHistoryScreen(controller: widget.controller),
+                  ),
+                ),
+                icon: const Icon(Icons.history_rounded),
+                label: const Text('Review past games'),
+              ),
+              const SizedBox(height: 10),
               OutlinedButton.icon(
                 onPressed: widget.controller.status == CloudStatus.connected
                     ? () => Navigator.push(
