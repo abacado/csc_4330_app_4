@@ -11,7 +11,7 @@ import 'memory/memory_screen.dart';
 // Teammates own their screen; keep navigation centralized here.
 Widget gameScreen(String id, ArcadeController controller) => switch (id) {
   'chess' => ChessScreen(controller: controller),
-  'checkers' => const CheckersScreen(),
+  'checkers' => CheckersScreen(controller: controller),
   'sudoku' => SudokuScreen(controller: controller),
   'word_search' => WordSearchScreen(controller: controller),
   'tic_tac_toe' => TicTacToeScreen(controller: controller),
