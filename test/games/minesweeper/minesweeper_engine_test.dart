@@ -4,17 +4,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:csc_4330_app_4/games/minesweeper/minesweeper_engine.dart';
 
 void main() {
-  test('The first reveal is never a mine, even when tapping a mine-dense corner', () {
-    for (var seed = 0; seed < 20; seed++) {
-      final engine = MinesweeperEngine(
-        MinesweeperDifficulty.easy,
-        random: Random(seed),
-      );
-      expect(engine.reveal(0), isTrue);
-      expect(engine.isMine(0), isFalse);
-      expect(engine.isLoss, isFalse);
-    }
-  });
+  test(
+    'The first reveal is never a mine, even when tapping a mine-dense corner',
+    () {
+      for (var seed = 0; seed < 20; seed++) {
+        final engine = MinesweeperEngine(
+          MinesweeperDifficulty.easy,
+          random: Random(seed),
+        );
+        expect(engine.reveal(0), isTrue);
+        expect(engine.isMine(0), isFalse);
+        expect(engine.isLoss, isFalse);
+      }
+    },
+  );
 
   test('Revealing a mine ends the game as a loss', () {
     final engine = MinesweeperEngine.fixed(
@@ -43,7 +46,8 @@ void main() {
     // All mines bunched in the bottom-right corner leaves the rest of the
     // 8x8 board open, so one reveal cascades across nearly the entire board.
     final mines = {
-      for (var r = 6; r < 8; r++) for (var c = 6; c < 8; c++) r * 8 + c,
+      for (var r = 6; r < 8; r++)
+        for (var c = 6; c < 8; c++) r * 8 + c,
     };
     final engine = MinesweeperEngine.fixed(
       difficulty: MinesweeperDifficulty.easy,

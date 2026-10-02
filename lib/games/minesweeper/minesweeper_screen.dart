@@ -12,7 +12,11 @@ import 'minesweeper_board.dart';
 import 'minesweeper_engine.dart';
 
 class MinesweeperScreen extends StatefulWidget {
-  const MinesweeperScreen({super.key, required this.controller, this.newEngine});
+  const MinesweeperScreen({
+    super.key,
+    required this.controller,
+    this.newEngine,
+  });
   final ArcadeController controller;
 
   /// Overrides engine creation, e.g. to supply deterministic mines in tests.
