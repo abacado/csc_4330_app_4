@@ -15,6 +15,6 @@ Widget gameScreen(String id, ArcadeController controller) => switch (id) {
   'sudoku' => SudokuScreen(controller: controller),
   'word_search' => WordSearchScreen(controller: controller),
   'tic_tac_toe' => TicTacToeScreen(controller: controller),
-  'memory' => const MemoryScreen(),
+  'memory' => MemoryScreen(controller: controller),
   _ => throw ArgumentError.value(id, 'id', 'Unknown game'),
 };

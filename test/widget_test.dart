@@ -65,14 +65,14 @@ void main() {
     tester,
   ) async {
     await launch(tester);
-    await tester.ensureVisible(find.text('Memory'));
+    await tester.ensureVisible(find.text('Checkers'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Memory'));
+    await tester.tap(find.text('Checkers'));
     await tester.pumpAndSettle();
     expect(find.text('A new challenge is loading'), findsOneWidget);
     await tester.tap(find.byTooltip('How to play'));
     await tester.pumpAndSettle();
-    expect(find.text('How to play Memory'), findsOneWidget);
+    expect(find.text('How to play Checkers'), findsOneWidget);
     await tester.tap(find.text('Got it'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Back to the arcade'));
