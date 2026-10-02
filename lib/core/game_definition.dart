@@ -103,6 +103,17 @@ const games = <GameDefinition>[
     players: 'Solo',
     ready: true,
   ),
+  GameDefinition(
+    id: 'game_2048',
+    name: '2048',
+    tagline: 'Slide. Merge. Reach 2048.',
+    instructions: 'Swipe (or use the arrow keys) to slide every tile. Two tiles with the same number merge into one. A new tile appears after each move. Make a 2048 tile to win — the round ends when no move is left.',
+    icon: Icons.grid_4x4_rounded,
+    color: Color(0xFFC8F27A),
+    category: GameCategory.puzzles,
+    players: 'Solo',
+    ready: true,
+  ),
 ];
 
 GameDefinition gameById(String id) => games.firstWhere((game) => game.id == id);

@@ -14,6 +14,14 @@ class LocalStore {
     }
   }
 
+  /// Highest score reached in a score-based game, or 0 if none yet.
+  int bestScore(String gameId) => preferences.getInt('best_score_$gameId') ?? 0;
+  Future<void> saveBestScore(String gameId, int score) async {
+    if (!await preferences.setInt('best_score_$gameId', score)) {
+      throw StateError('Could not save best score');
+    }
+  }
+
   List<GameResult> loadResults() {
     final results = <GameResult>[];
     for (final value in preferences.getStringList('results') ?? <String>[]) {

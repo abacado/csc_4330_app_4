@@ -8,6 +8,7 @@ import 'word_search/word_search_screen.dart';
 import 'tic_tac_toe/tic_tac_toe_screen.dart';
 import 'memory/memory_screen.dart';
 import 'minesweeper/minesweeper_screen.dart';
+import 'game_2048/game_2048_screen.dart';
 
 // Teammates own their screen; keep navigation centralized here.
 Widget gameScreen(String id, ArcadeController controller) => switch (id) {
@@ -18,5 +19,6 @@ Widget gameScreen(String id, ArcadeController controller) => switch (id) {
   'tic_tac_toe' => TicTacToeScreen(controller: controller),
   'memory' => MemoryScreen(controller: controller),
   'minesweeper' => MinesweeperScreen(controller: controller),
+  'game_2048' => Game2048Screen(controller: controller),
   _ => throw ArgumentError.value(id, 'id', 'Unknown game'),
 };
